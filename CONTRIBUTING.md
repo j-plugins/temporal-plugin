@@ -1,0 +1,87 @@
+# Temporal Plugin Contribution Guidelines
+
+This document outlines the architecture and standards for the Temporal IntelliJ IDEA plugin. It is intended for both human contributors and AI agents.
+
+## Project Overview
+The plugin aims to improve the Developer Experience (DX) for [Temporal](https://temporal.io/) users across all IDEs based on the IntelliJ Platform. It supports multiple languages through a modular architecture.
+
+## Architecture
+
+The project is structured around a **Base Package**: `com.github.xepozz.temporal`
+
+### 1. `common` Package
+Contains language-agnostic logic, base classes, and Extension Points (EPs).
+- **Location**: `src/main/kotlin/com/github/xepozz/temporal/common`
+- **Purpose**: Define how features should work across all languages.
+- **Components**:
+    - **Extension Points (EP)**: Interfaces or abstract classes that define the contract for language-specific support.
+    - **Shared Providers**: Implementations of IntelliJ Platform features (like `CompletionProvider`) that iterate over registered extensions to provide a unified experience.
+
+### 2. `languages` Package
+Contains language-specific implementations (adapters).
+- **Location**: `src/main/kotlin/com/github/xepozz/temporal/languages/<lang>`
+- **Purpose**: Adapt language-specific PSI (Program Structure Interface) to the common Temporal features.
+- **Example**: `com.github.xepozz.temporal.languages.php`
+
+## Extension Point Pattern
+
+When implementing a feature that should work across multiple languages (e.g., Activity Name completion), follow this pattern:
+
+1.  **Define the EP Interface** in `common`:
+    ```kotlin
+    // common/completion/ActivityCompletionEP.kt
+    interface ActivityCompletionEP {
+        fun getActivityNames(project: Project): List<String>
+    }
+    ```
+2.  **Register the EP** in `plugin.xml`:
+    ```xml
+    <extensionPoints>
+        <extensionPoint name="activityCompletion" interface="com.github.xepozz.temporal.common.completion.ActivityCompletionEP"/>
+    </extensionPoints>
+    ```
+3.  **Implement the Shared Provider** in `common`:
+    ```kotlin
+    // common/completion/ActivityCompletionProvider.kt
+    class ActivityCompletionProvider : CompletionProvider<CompletionParameters>() {
+        override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
+            val ep = ExtensionPointName.create<ActivityCompletionEP>("com.github.xepozz.temporal.activityCompletion")
+            ep.extensionList.forEach { adapter ->
+                adapter.getActivityNames(parameters.editor.project!!).forEach { result.addElement(LookupElementBuilder.create(it)) }
+            }
+        }
+    }
+    ```
+4.  **Implement the Language Adapter**:
+    ```kotlin
+    // languages/php/completion/PhpActivityCompletionProvider.kt
+    class PhpActivityCompletionProvider : ActivityCompletionEP {
+        override fun getActivityNames(project: Project): List<String> {
+            // PHP-specific logic to find Activity names
+        }
+    }
+    ```
+5.  **Register the Adapter** in the language-specific XML (e.g., `language-php.xml`):
+    ```xml
+    <extensions defaultExtensionNs="com.github.xepozz.temporal">
+        <activityCompletion implementation="com.github.xepozz.temporal.languages.php.completion.PhpActivityCompletionProvider"/>
+    </extensions>
+    ```
+
+## Coding Standards
+
+- **Kotlin First**: All new code should be written in Kotlin.
+- **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate.
+- **Consistency**: Follow the existing package structure. If a feature exists for PHP in `languages.php.navigation`, its Java counterpart should be in `languages.java.navigation`.
+- **Naming**:
+    - Extension Points should end with `EP`.
+    - Language-specific implementations should be prefixed with the language name (e.g., `Php...`, `Java...`).
+
+## AI Agent Instructions
+
+When tasked with adding a new feature:
+1.  **Check for existing EP**: See if there's already a relevant EP in `common`.
+2.  **Create EP if missing**: If the feature is new and can be shared, create the EP in `common` first.
+3.  **Use existing patterns**: Look at `languages/php` for reference on how to interact with language-specific PSI.
+4.  **Update XML**: Don't forget to register new classes in `plugin.xml` or language-specific XML files.
+5.  **Be Minimal**: Implement the smallest possible change to achieve the goal while maintaining architectural integrity.

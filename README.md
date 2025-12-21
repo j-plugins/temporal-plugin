@@ -29,6 +29,10 @@ Supported languages:
 - PHP
 - Open an issue if you need support for another language
 
+## Contribution Guidelines
+
+For information on the project architecture and how to contribute (for both humans and AI agents), please see our [Contribution Guidelines](CONTRIBUTING.md).
+
 ## Donation
 
 Open-source tools can greatly improve workflows, helping developers and businesses save time and increase revenue.
