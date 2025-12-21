@@ -5,6 +5,7 @@
     <vendor email="xepozz@list.ru" url="https://github.com/xepozz">Dmitrii Derepko (@xepozz)</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="language-php.xml">com.jetbrains.php</depends>
 
     <resource-bundle>messages.TemporalBundle</resource-bundle>
 
