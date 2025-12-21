@@ -21,6 +21,7 @@ Contains language-agnostic logic, base classes, and Extension Points (EPs).
 Contains language-specific implementations (adapters).
 - **Location**: `src/main/kotlin/com/github/xepozz/temporal/languages/<lang>`
 - **Purpose**: Adapt language-specific PSI (Program Structure Interface) to the common Temporal features.
+- **Current Status**: Currently, the focus is exclusively on **PHP**. Support for other languages (Go, Java, TypeScript, etc.) will be added in the future.
 - **Example**: `com.github.xepozz.temporal.languages.php`
 
 ## Extension Point Pattern
@@ -72,10 +73,12 @@ When implementing a feature that should work across multiple languages (e.g., Ac
 
 - **Kotlin First**: All new code should be written in Kotlin.
 - **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate.
-- **Consistency**: Follow the existing package structure. If a feature exists for PHP in `languages.php.navigation`, its Java counterpart should be in `languages.java.navigation`.
+- **Consistency**: Follow the existing package structure. For example, if a feature is implemented for PHP in `languages.php.navigation`, any future language implementations should follow the same sub-package structure (e.g., `languages.go.navigation`).
 - **Naming**:
     - Extension Points should end with `EP`.
-    - Language-specific implementations should be prefixed with the language name (e.g., `Php...`, `Java...`).
+    - Language-specific implementations should be prefixed with the language name (e.g., `Php...`).
+- **Namespaces**:
+    - All Extension Point names and IDs **must** start with `com.github.xepozz.temporal`.
 
 ## AI Agent Instructions
 
@@ -85,3 +88,4 @@ When tasked with adding a new feature:
 3.  **Use existing patterns**: Look at `languages/php` for reference on how to interact with language-specific PSI.
 4.  **Update XML**: Don't forget to register new classes in `plugin.xml` or language-specific XML files.
 5.  **Be Minimal**: Implement the smallest possible change to achieve the goal while maintaining architectural integrity.
+6.  **Namespace Compliance**: Ensure all new extension points and IDs start with `com.github.xepozz.temporal`.
