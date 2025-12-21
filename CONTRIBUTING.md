@@ -41,7 +41,7 @@ When implementing a feature that should work across multiple languages (e.g., Ac
             val ACTIVITY_EP = ExtensionPointName.create<Activity>("com.github.xepozz.temporal.activity")
 
             fun getActivities(project: Project): List<ActivityModel> {
-                return ACTIVITY_EP.extensionList.flatMap { it.getActivities(project) }
+                return ACTIVITY_EP.lazyDumbAwareExtensions(project).flatMap { it.getActivities(project) }.toList()
             }
         }
     }
@@ -82,7 +82,7 @@ When implementing a feature that should work across multiple languages (e.g., Ac
 ## Coding Standards
 
 - **Kotlin First**: All new code should be written in Kotlin.
-- **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate.
+- **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate. Use `lazyDumbAwareExtensions(project)` instead of `extensionList` when accessing Extension Points to ensure better performance and compatibility with dumb mode.
 - **Consistency**: Follow the existing package structure. For example, if a feature is implemented for PHP in `languages.php.navigation`, any future language implementations should follow the same sub-package structure (e.g., `languages.go.navigation`).
 - **Naming**:
     - Extension Points should **not** end with `EP`. They should represent the entity or feature (e.g., `ActivityCompletion`, `Workflow`).

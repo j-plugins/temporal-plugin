@@ -5,6 +5,13 @@
                 implementation="com.github.xepozz.temporal.languages.php.TemporalTypeProvider"/>
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <fileBasedIndex implementation="com.github.xepozz.temporal.languages.php.index.PhpWorkflowClassIndex"/>
+        <fileBasedIndex implementation="com.github.xepozz.temporal.languages.php.index.PhpWorkflowMethodIndex"/>
+        <fileBasedIndex implementation="com.github.xepozz.temporal.languages.php.index.PhpActivityClassIndex"/>
+        <fileBasedIndex implementation="com.github.xepozz.temporal.languages.php.index.PhpActivityMethodIndex"/>
+    </extensions>
+
     <extensions defaultExtensionNs="com.github.xepozz.temporal">
         <workflow implementation="com.github.xepozz.temporal.languages.php.endpoints.PhpWorkflow"/>
         <activity implementation="com.github.xepozz.temporal.languages.php.endpoints.PhpActivity"/>

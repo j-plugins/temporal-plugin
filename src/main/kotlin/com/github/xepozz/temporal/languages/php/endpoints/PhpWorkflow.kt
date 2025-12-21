@@ -1,10 +1,11 @@
 package com.github.xepozz.temporal.languages.php.endpoints
 
 import com.github.xepozz.temporal.common.extensionPoints.Workflow
-import com.github.xepozz.temporal.languages.php.TemporalClasses
-import com.github.xepozz.temporal.languages.php.hasAttribute
+import com.github.xepozz.temporal.languages.php.index.PhpWorkflowClassIndex
+import com.github.xepozz.temporal.languages.php.index.PhpWorkflowMethodIndex
 import com.intellij.openapi.project.Project
 import com.intellij.psi.SmartPointerManager
+import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
 import com.github.xepozz.temporal.common.model.Workflow as WorkflowModel
 
@@ -12,17 +13,53 @@ class PhpWorkflow : Workflow {
     override fun getWorkflows(project: Project): List<WorkflowModel> {
         val phpIndex = PhpIndex.getInstance(project)
         val smartPointerManager = SmartPointerManager.getInstance(project)
-        return phpIndex.getAllClassNames(null).flatMap { name ->
-            phpIndex.getClassesByName(name)
-                .filter { it.hasAttribute(TemporalClasses.WORKFLOW) }
-                .map {
+        val results = mutableListOf<WorkflowModel>()
+
+        val classFqns = mutableSetOf<String>()
+        FileBasedIndex.getInstance().processAllKeys(PhpWorkflowClassIndex.NAME, { key ->
+            classFqns.add(key)
+            true
+        }, project)
+
+        classFqns.forEach { fqn ->
+            phpIndex.getClassesByFQN(fqn).forEach { phpClass ->
+                results.add(
                     WorkflowModel(
-                        id = it.name,
+                        id = phpClass.name,
                         language = "PHP",
-                        psiAnchor = smartPointerManager.createSmartPsiElementPointer(it),
+                        psiAnchor = smartPointerManager.createSmartPsiElementPointer(phpClass),
                         parameters = emptyList()
                     )
-                }
+                )
+            }
         }
+
+        val methodKeys = mutableSetOf<String>()
+        FileBasedIndex.getInstance().processAllKeys(PhpWorkflowMethodIndex.NAME, { key ->
+            methodKeys.add(key)
+            true
+        }, project)
+
+        methodKeys.forEach { key ->
+            val parts = key.split("::")
+            if (parts.size == 2) {
+                val classFqn = parts[0]
+                val methodName = parts[1]
+                phpIndex.getClassesByFQN(classFqn).forEach { phpClass ->
+                    phpClass.methods.find { it.name == methodName }?.let { method ->
+                        results.add(
+                            WorkflowModel(
+                                id = "$methodName (${phpClass.name})",
+                                language = "PHP",
+                                psiAnchor = smartPointerManager.createSmartPsiElementPointer(method),
+                                parameters = emptyList()
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        return results
     }
 }
