@@ -18,11 +18,34 @@
 - [ ] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+[Github](https://github.com/j-plugins/temporal-plugin) | [Telegram](https://t.me/jb_plugins) | [Donation](https://github.com/xepozz/xepozz?tab=readme-ov-file#become-a-sponsor)
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+## Temporal
+
+Temporal is an open source durable execution solution that abstracts away complexity from building scalable, distributed systems and helps you deliver more reliable applications, faster.
+
+Supported languages:
+- PHP
+- Open an issue if you need support for another language
+
+## Donation
+
+Open-source tools can greatly improve workflows, helping developers and businesses save time and increase revenue.
+Many successful projects have been built on these tools, benefiting a wide community.
+However, maintaining and enhancing these resources requires continuous effort and investment.
+
+Support from the community helps keep these projects alive and ensures they remain useful for everyone.
+Donations play a key role in sustaining and improving these open-source initiatives.
+
+Chose the best option for you to say thank you:
+
+[<img height="28" src="https://github.githubassets.com/assets/patreon-96b15b9db4b9.svg"> Patreon](https://patreon.com/xepozz)
+|
+[<img height="28" src="https://github.githubassets.com/assets/buy_me_a_coffee-63ed78263f6e.svg"> Buy me a coffee](https://buymeacoffee.com/xepozz)
+|
+[<img height="28" src="https://boosty.to/favicon.ico"> Boosty](https://boosty.to/xepozz)
+
 <!-- Plugin description end -->
 
 ## Installation

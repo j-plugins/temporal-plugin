@@ -1,13 +1,13 @@
-package com.github.xepozz.temporalplugin
+package com.github.xepozz.temporal
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.MyBundle"
+private const val BUNDLE = "messages.TemporalBundle"
 
-object MyBundle : DynamicBundle(BUNDLE) {
+object TemporalBundle : DynamicBundle(BUNDLE) {
 
     @JvmStatic
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =

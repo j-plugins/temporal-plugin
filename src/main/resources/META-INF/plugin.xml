@@ -1,15 +1,18 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.xepozz.temporalplugin</id>
-    <name>temporal-plugin</name>
-    <vendor>xepozz</vendor>
+    <id>com.github.xepozz.temporal</id>
+    <name>Temporal</name>
+    <vendor email="xepozz@list.ru" url="https://github.com/xepozz">Dmitrii Derepko (@xepozz)</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.TemporalBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.xepozz.temporalplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.xepozz.temporalplugin.startup.MyProjectActivity" />
+        <toolWindow
+                id="Temporal" icon="/META-INF/pluginIcon.svg"
+                anchor="right" doNotActivateOnStart="true" secondary="false"
+                factoryClass="com.github.xepozz.temporal.toolWindow.TemporalToolWindowFactory"
+        />
     </extensions>
 </idea-plugin>
