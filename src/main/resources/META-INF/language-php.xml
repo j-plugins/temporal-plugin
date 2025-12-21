@@ -1,6 +1,7 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.jetbrains.php">
         <typeProvider4
+                order="first"
                 implementation="com.github.xepozz.temporal.languages.php.TemporalTypeProvider"/>
     </extensions>
 </idea-plugin>
