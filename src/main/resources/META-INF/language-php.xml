@@ -4,4 +4,9 @@
                 order="first"
                 implementation="com.github.xepozz.temporal.languages.php.TemporalTypeProvider"/>
     </extensions>
+
+    <extensions defaultExtensionNs="com.github.xepozz.temporal">
+        <workflow implementation="com.github.xepozz.temporal.languages.php.endpoints.PhpWorkflow"/>
+        <activity implementation="com.github.xepozz.temporal.languages.php.endpoints.PhpActivity"/>
+    </extensions>
 </idea-plugin>

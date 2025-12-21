@@ -9,7 +9,14 @@
 
     <resource-bundle>messages.TemporalBundle</resource-bundle>
 
+    <extensionPoints>
+        <extensionPoint name="workflow" interface="com.github.xepozz.temporal.common.extensionPoints.Workflow"/>
+        <extensionPoint name="activity" interface="com.github.xepozz.temporal.common.extensionPoints.Activity"/>
+    </extensionPoints>
+
     <extensions defaultExtensionNs="com.intellij">
+        <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalWorkflowEndpointsProvider"/>
+        <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalActivityEndpointsProvider"/>
         <toolWindow
                 id="Temporal" icon="/META-INF/pluginIcon.svg"
                 anchor="right" doNotActivateOnStart="true" secondary="false"

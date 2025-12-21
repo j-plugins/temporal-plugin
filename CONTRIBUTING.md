@@ -12,6 +12,9 @@ The project is structured around a **Base Package**: `com.github.xepozz.temporal
 ### 1. `common` Package
 Contains language-agnostic logic, base classes, and Extension Points (EPs).
 - **Location**: `src/main/kotlin/com/github/xepozz/temporal/common`
+- **Sub-packages**:
+    - `extensionPoints`: Contains all Extension Point interfaces.
+    - `model`: Contains common data classes representing Temporal entities (Workflows, Activities).
 - **Purpose**: Define how features should work across all languages.
 - **Components**:
     - **Extension Points (EP)**: Interfaces or abstract classes that define the contract for language-specific support.
@@ -28,17 +31,25 @@ Contains language-specific implementations (adapters).
 
 When implementing a feature that should work across multiple languages (e.g., Activity Name completion), follow this pattern:
 
-1.  **Define the EP Interface** in `common`:
+1.  **Define the EP Interface** in `common.extensionPoints`:
     ```kotlin
-    // common/completion/ActivityCompletionEP.kt
-    interface ActivityCompletionEP {
-        fun getActivityNames(project: Project): List<String>
+    // common/extensionPoints/Activity.kt
+    interface Activity {
+        fun getActivities(project: Project): List<ActivityModel>
+
+        companion object {
+            val ACTIVITY_EP = ExtensionPointName.create<Activity>("com.github.xepozz.temporal.activity")
+
+            fun getActivities(project: Project): List<ActivityModel> {
+                return ACTIVITY_EP.extensionList.flatMap { it.getActivities(project) }
+            }
+        }
     }
     ```
 2.  **Register the EP** in `plugin.xml`:
     ```xml
     <extensionPoints>
-        <extensionPoint name="activityCompletion" interface="com.github.xepozz.temporal.common.completion.ActivityCompletionEP"/>
+        <extensionPoint name="activity" interface="com.github.xepozz.temporal.common.extensionPoints.Activity"/>
     </extensionPoints>
     ```
 3.  **Implement the Shared Provider** in `common`:
@@ -46,26 +57,25 @@ When implementing a feature that should work across multiple languages (e.g., Ac
     // common/completion/ActivityCompletionProvider.kt
     class ActivityCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
-            val ep = ExtensionPointName.create<ActivityCompletionEP>("com.github.xepozz.temporal.activityCompletion")
-            ep.extensionList.forEach { adapter ->
-                adapter.getActivityNames(parameters.editor.project!!).forEach { result.addElement(LookupElementBuilder.create(it)) }
+            ActivityCompletion.getActivityNames(parameters.editor.project!!).forEach {
+                result.addElement(LookupElementBuilder.create(it))
             }
         }
     }
     ```
 4.  **Implement the Language Adapter**:
     ```kotlin
-    // languages/php/completion/PhpActivityCompletionProvider.kt
-    class PhpActivityCompletionProvider : ActivityCompletionEP {
-        override fun getActivityNames(project: Project): List<String> {
-            // PHP-specific logic to find Activity names
+    // languages/php/endpoints/PhpActivity.kt
+    class PhpActivity : Activity {
+        override fun getActivities(project: Project): List<ActivityModel> {
+            // PHP-specific logic to find Activities
         }
     }
     ```
 5.  **Register the Adapter** in the language-specific XML (e.g., `language-php.xml`):
     ```xml
     <extensions defaultExtensionNs="com.github.xepozz.temporal">
-        <activityCompletion implementation="com.github.xepozz.temporal.languages.php.completion.PhpActivityCompletionProvider"/>
+        <activity implementation="com.github.xepozz.temporal.languages.php.endpoints.PhpActivity"/>
     </extensions>
     ```
 
@@ -75,7 +85,7 @@ When implementing a feature that should work across multiple languages (e.g., Ac
 - **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate.
 - **Consistency**: Follow the existing package structure. For example, if a feature is implemented for PHP in `languages.php.navigation`, any future language implementations should follow the same sub-package structure (e.g., `languages.go.navigation`).
 - **Naming**:
-    - Extension Points should end with `EP`.
+    - Extension Points should **not** end with `EP`. They should represent the entity or feature (e.g., `ActivityCompletion`, `Workflow`).
     - Language-specific implementations should be prefixed with the language name (e.g., `Php...`).
 - **Namespaces**:
     - All Extension Point names and IDs **must** start with `com.github.xepozz.temporal`.
