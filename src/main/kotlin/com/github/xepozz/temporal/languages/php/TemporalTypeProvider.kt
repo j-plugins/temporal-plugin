@@ -30,11 +30,9 @@ class TemporalTypeProvider : PhpTypeProvider4 {
                 element.resolveGlobal(true)
                     .mapNotNull { it as? Method }
                     .mapNotNull {
-                        val containingClass = it.containingClass ?: return@mapNotNull null
-
                         return@mapNotNull when {
-                            containingClass.hasAttribute(TemporalClasses.ACTIVITY) -> it
-                            containingClass.hasAttribute(TemporalClasses.WORKFLOW) -> it
+                            it.isActivity() -> it
+                            it.isWorkflow() -> it
                             else -> null
                         }
                     },

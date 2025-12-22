@@ -3,6 +3,7 @@ package com.github.xepozz.temporal.languages.php.endpoints
 import com.github.xepozz.temporal.common.extensionPoints.Workflow
 import com.github.xepozz.temporal.languages.php.index.PhpWorkflowClassIndex
 import com.github.xepozz.temporal.languages.php.index.PhpWorkflowMethodIndex
+import com.github.xepozz.temporal.languages.php.isWorkflow
 import com.intellij.openapi.project.Project
 import com.intellij.psi.SmartPointerManager
 import com.intellij.util.indexing.FileBasedIndex
@@ -22,7 +23,7 @@ class PhpWorkflow : Workflow {
         }, project)
 
         classFqns.forEach { fqn ->
-            phpIndex.getClassesByFQN(fqn).forEach { phpClass ->
+            phpIndex.getClassesByFQN(fqn).filter { it.isWorkflow() }.forEach { phpClass ->
                 results.add(
                     WorkflowModel(
                         id = phpClass.name,
@@ -46,7 +47,7 @@ class PhpWorkflow : Workflow {
                 val classFqn = parts[0]
                 val methodName = parts[1]
                 phpIndex.getClassesByFQN(classFqn).forEach { phpClass ->
-                    phpClass.methods.find { it.name == methodName }?.let { method ->
+                    phpClass.methods.find { it.name == methodName && it.isWorkflow() }?.let { method ->
                         results.add(
                             WorkflowModel(
                                 id = "$methodName (${phpClass.name})",

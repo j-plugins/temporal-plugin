@@ -83,6 +83,7 @@ When implementing a feature that should work across multiple languages (e.g., Ac
 
 - **Kotlin First**: All new code should be written in Kotlin.
 - **Performance**: Use `CachedValue` and `DumbService.isDumb()` checks where appropriate. Use `lazyDumbAwareExtensions(project)` instead of `extensionList` when accessing Extension Points to ensure better performance and compatibility with dumb mode.
+- **PHP Utils**: For PHP support, use utility methods from `com.github.xepozz.temporal.languages.php.MixinKt` such as `isActivity()` and `isWorkflow()` on `PhpClass` and `Method` instead of manually checking attributes. Note that `Method.isActivity()` and `Method.isWorkflow()` are tolerant and return `true` for public methods even without explicit attributes if the containing class is an Activity or Workflow.
 - **Consistency**: Follow the existing package structure. For example, if a feature is implemented for PHP in `languages.php.navigation`, any future language implementations should follow the same sub-package structure (e.g., `languages.go.navigation`).
 - **Naming**:
     - Extension Points should **not** end with `EP`. They should represent the entity or feature (e.g., `ActivityCompletion`, `Workflow`).

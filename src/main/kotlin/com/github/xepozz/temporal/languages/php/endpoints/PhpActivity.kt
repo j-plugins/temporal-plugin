@@ -3,6 +3,7 @@ package com.github.xepozz.temporal.languages.php.endpoints
 import com.github.xepozz.temporal.common.extensionPoints.Activity
 import com.github.xepozz.temporal.languages.php.index.PhpActivityClassIndex
 import com.github.xepozz.temporal.languages.php.index.PhpActivityMethodIndex
+import com.github.xepozz.temporal.languages.php.isActivity
 import com.intellij.openapi.project.Project
 import com.intellij.psi.SmartPointerManager
 import com.intellij.util.indexing.FileBasedIndex
@@ -22,7 +23,7 @@ class PhpActivity : Activity {
         }, project)
 
         classFqns.forEach { fqn ->
-            phpIndex.getClassesByFQN(fqn).forEach { phpClass ->
+            phpIndex.getClassesByFQN(fqn).filter { it.isActivity() }.forEach { phpClass ->
                 results.add(
                     ActivityModel(
                         id = phpClass.name,
@@ -46,7 +47,7 @@ class PhpActivity : Activity {
                 val classFqn = parts[0]
                 val methodName = parts[1]
                 phpIndex.getClassesByFQN(classFqn).forEach { phpClass ->
-                    phpClass.methods.find { it.name == methodName }?.let { method ->
+                    phpClass.methods.find { it.name == methodName && it.isActivity() }?.let { method ->
                         results.add(
                             ActivityModel(
                                 id = "$methodName (${phpClass.name})",

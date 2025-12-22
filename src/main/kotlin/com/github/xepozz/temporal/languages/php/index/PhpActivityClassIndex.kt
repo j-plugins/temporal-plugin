@@ -1,8 +1,7 @@
 package com.github.xepozz.temporal.languages.php.index
 
 import com.github.xepozz.temporal.common.index.AbstractIndex
-import com.github.xepozz.temporal.languages.php.TemporalClasses
-import com.github.xepozz.temporal.languages.php.hasAttribute
+import com.github.xepozz.temporal.languages.php.isActivity
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.indexing.DataIndexer
 import com.intellij.util.indexing.FileBasedIndex
@@ -27,7 +26,7 @@ class PhpActivityClassIndex : AbstractIndex<String>() {
             val result = mutableMapOf<String, String>()
             val classes = PsiTreeUtil.findChildrenOfType(phpFile, PhpClass::class.java)
             for (phpClass in classes) {
-                if (phpClass.hasAttribute(TemporalClasses.ACTIVITY)) {
+                if (phpClass.isActivity()) {
                     val fqn = phpClass.fqn
                     result[fqn] = fqn
                 }
