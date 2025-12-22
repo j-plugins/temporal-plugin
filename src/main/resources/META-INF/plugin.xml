@@ -5,22 +5,46 @@
     <vendor email="xepozz@list.ru" url="https://github.com/xepozz">Dmitrii Derepko (@xepozz)</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.github.xepozz.metastorm</depends>
     <depends optional="true" config-file="language-php.xml">com.jetbrains.php</depends>
 
     <resource-bundle>messages.TemporalBundle</resource-bundle>
 
     <extensionPoints>
-        <extensionPoint name="workflow" interface="com.github.xepozz.temporal.common.extensionPoints.Workflow"/>
-        <extensionPoint name="activity" interface="com.github.xepozz.temporal.common.extensionPoints.Activity"/>
+        <extensionPoint
+                name="workflow" dynamic="true"
+                interface="com.github.xepozz.temporal.common.extensionPoints.Workflow"/>
+        <extensionPoint
+                name="activity" dynamic="true"
+                interface="com.github.xepozz.temporal.common.extensionPoints.Activity"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
         <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalWorkflowEndpointsProvider"/>
         <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalActivityEndpointsProvider"/>
-        <toolWindow
-                id="Temporal" icon="/META-INF/pluginIcon.svg"
-                anchor="right" doNotActivateOnStart="true" secondary="false"
-                factoryClass="com.github.xepozz.temporal.toolWindow.TemporalToolWindowFactory"
+        <projectConfigurable
+                id="settings.temporal" groupId="language" dynamic="true"
+                bundle="messages.TemporalBundle" key="settings.configurable.title"
+                instance="com.github.xepozz.temporal.common.uiViewer.configuration.TemporalSettingsConfigurable"
         />
+        <toolWindow
+                id="Temporal" icon="/icons/temporal/icon.svg"
+                anchor="right" doNotActivateOnStart="true" secondary="false"
+                factoryClass="com.github.xepozz.temporal.common.uiViewer.TemporalWindowFactory"
+        />
+
+        <notificationGroup
+                id="TemporalWindow"
+                displayType="TOOL_WINDOW"
+                toolWindowId="Temporal"
+                isLogByDefault="true"
+                bundle="messages.TemporalBundle"
+                key="notification.group"/>
+        <notificationGroup
+                id="Temporal"
+                displayType="BALLOON"
+                isLogByDefault="true"
+                bundle="messages.TemporalBundle"
+                key="notification.group"/>
     </extensions>
 </idea-plugin>
