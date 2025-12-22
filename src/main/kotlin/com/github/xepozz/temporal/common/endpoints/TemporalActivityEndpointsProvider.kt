@@ -46,7 +46,7 @@ class TemporalActivityEndpointsProvider : EndpointsProvider<ActivityEndpointGrou
         return object : ItemPresentation {
             override fun getPresentableText(): String = endpoint.activity.id
             override fun getLocationString(): String? = endpoint.activity.psiAnchor?.dereference()?.containingFile?.name
-            override fun getIcon(unused: Boolean): Icon = TemporalIcons.TEMPORAL
+            override fun getIcon(unused: Boolean): Icon = TemporalIcons.ACTIVITY
         }
     }
 }

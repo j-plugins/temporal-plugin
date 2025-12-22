@@ -8,4 +8,10 @@ object TemporalIcons {
 
     @JvmField
     val CLEAR_OUTPUTS = IconLoader.getIcon("/icons/clearOutputs/icon.svg", this::class.java)
+
+    @JvmField
+    val ACTIVITY = IconLoader.getIcon("/icons/activity/icon.svg", this::class.java)
+
+    @JvmField
+    val WORKFLOW = IconLoader.getIcon("/icons/workflow/icon.svg", this::class.java)
 }

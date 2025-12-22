@@ -46,7 +46,7 @@ class TemporalWorkflowEndpointsProvider : EndpointsProvider<WorkflowEndpointGrou
         return object : ItemPresentation {
             override fun getPresentableText(): String = endpoint.workflow.id
             override fun getLocationString(): String? = endpoint.workflow.psiAnchor?.dereference()?.containingFile?.name
-            override fun getIcon(unused: Boolean): Icon = TemporalIcons.TEMPORAL
+            override fun getIcon(unused: Boolean): Icon = TemporalIcons.WORKFLOW
         }
     }
 }
