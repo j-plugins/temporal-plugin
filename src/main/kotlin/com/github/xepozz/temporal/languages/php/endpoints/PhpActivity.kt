@@ -4,17 +4,20 @@ import com.github.xepozz.temporal.common.extensionPoints.Activity
 import com.github.xepozz.temporal.languages.php.index.PhpActivityClassIndex
 import com.github.xepozz.temporal.languages.php.index.PhpActivityMethodIndex
 import com.github.xepozz.temporal.languages.php.isActivity
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.psi.SmartPointerManager
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
 import com.github.xepozz.temporal.common.model.Activity as ActivityModel
 
 class PhpActivity : Activity {
-    override fun getActivities(project: Project): List<ActivityModel> {
+    override fun getActivities(project: Project, module: Module?): List<ActivityModel> {
         val phpIndex = PhpIndex.getInstance(project)
         val smartPointerManager = SmartPointerManager.getInstance(project)
         val results = mutableListOf<ActivityModel>()
+        val scope = module?.moduleContentScope ?: GlobalSearchScope.allScope(project)
 
         val classFqns = mutableSetOf<String>()
         FileBasedIndex.getInstance().processAllKeys(PhpActivityClassIndex.NAME, { key ->
@@ -23,7 +26,7 @@ class PhpActivity : Activity {
         }, project)
 
         classFqns.forEach { fqn ->
-            phpIndex.getClassesByFQN(fqn).filter { it.isActivity() }.forEach { phpClass ->
+            phpIndex.getClassesByFQN(fqn).filter { it.isActivity() && scope.contains(it.containingFile.virtualFile) }.forEach { phpClass ->
                 results.add(
                     ActivityModel(
                         id = phpClass.name,
@@ -47,7 +50,7 @@ class PhpActivity : Activity {
                 val classFqn = parts[0]
                 val methodName = parts[1]
                 phpIndex.getClassesByFQN(classFqn).forEach { phpClass ->
-                    phpClass.methods.find { it.name == methodName && it.isActivity() }?.let { method ->
+                    phpClass.methods.find { it.name == methodName && it.isActivity() && scope.contains(it.containingFile.virtualFile) }?.let { method ->
                         results.add(
                             ActivityModel(
                                 id = "${phpClass.name}::$methodName",

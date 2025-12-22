@@ -6,6 +6,7 @@ import com.intellij.microservices.endpoints.EndpointType
 import com.intellij.microservices.endpoints.EndpointsFilter
 import com.intellij.microservices.endpoints.EndpointsProvider
 import com.intellij.microservices.endpoints.FrameworkPresentation
+import com.intellij.microservices.endpoints.ModuleEndpointsFilter
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
@@ -19,7 +20,8 @@ class TemporalWorkflowEndpointsProvider : EndpointsProvider<WorkflowEndpointGrou
     override val presentation: FrameworkPresentation = FrameworkPresentation("Temporal Workflow", "Temporal Workflow", TemporalIcons.TEMPORAL)
 
     override fun getEndpointGroups(project: Project, filter: EndpointsFilter): Iterable<WorkflowEndpointGroup> {
-        return Workflow.getWorkflows(project).map { WorkflowEndpointGroup(it) }
+        if (filter !is ModuleEndpointsFilter) return emptyList()
+        return Workflow.getWorkflows(project, filter.module).map { WorkflowEndpointGroup(it) }
     }
 
     override fun getEndpoints(group: WorkflowEndpointGroup): Iterable<WorkflowEndpoint> {

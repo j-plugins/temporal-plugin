@@ -6,6 +6,7 @@ import com.intellij.microservices.endpoints.EndpointType
 import com.intellij.microservices.endpoints.EndpointsFilter
 import com.intellij.microservices.endpoints.EndpointsProvider
 import com.intellij.microservices.endpoints.FrameworkPresentation
+import com.intellij.microservices.endpoints.ModuleEndpointsFilter
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
@@ -19,7 +20,8 @@ class TemporalActivityEndpointsProvider : EndpointsProvider<ActivityEndpointGrou
     override val presentation: FrameworkPresentation = FrameworkPresentation("Temporal Activity", "Temporal Activity", TemporalIcons.TEMPORAL)
 
     override fun getEndpointGroups(project: Project, filter: EndpointsFilter): Iterable<ActivityEndpointGroup> {
-        return Activity.getActivities(project).map { ActivityEndpointGroup(it) }
+        if (filter !is ModuleEndpointsFilter) return emptyList()
+        return Activity.getActivities(project, filter.module).map { ActivityEndpointGroup(it) }
     }
 
     override fun getEndpoints(group: ActivityEndpointGroup): Iterable<ActivityEndpoint> {

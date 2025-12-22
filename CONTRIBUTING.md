@@ -35,13 +35,13 @@ When implementing a feature that should work across multiple languages (e.g., Ac
     ```kotlin
     // common/extensionPoints/Activity.kt
     interface Activity {
-        fun getActivities(project: Project): List<ActivityModel>
+        fun getActivities(project: Project, module: Module? = null): List<ActivityModel>
 
         companion object {
             val ACTIVITY_EP = ExtensionPointName.create<Activity>("com.github.xepozz.temporal.activity")
 
-            fun getActivities(project: Project): List<ActivityModel> {
-                return ACTIVITY_EP.lazyDumbAwareExtensions(project).flatMap { it.getActivities(project) }.toList()
+            fun getActivities(project: Project, module: Module? = null): List<ActivityModel> {
+                return ACTIVITY_EP.lazyDumbAwareExtensions(project).flatMap { it.getActivities(project, module) }.toList()
             }
         }
     }
@@ -67,7 +67,7 @@ When implementing a feature that should work across multiple languages (e.g., Ac
     ```kotlin
     // languages/php/endpoints/PhpActivity.kt
     class PhpActivity : Activity {
-        override fun getActivities(project: Project): List<ActivityModel> {
+        override fun getActivities(project: Project, module: Module?): List<ActivityModel> {
             // PHP-specific logic to find Activities
         }
     }
