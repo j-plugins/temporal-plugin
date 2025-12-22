@@ -26,18 +26,17 @@ class TemporalTypeProvider : PhpTypeProvider4 {
 
     private fun getMethodUsageType(element: MethodReference): PhpType? {
         val targetMethods = CachedValuesManager.getCachedValue(element) {
-            CachedValueProvider.Result.create(
-                element.resolveGlobal(true)
-                    .mapNotNull { it as? Method }
-                    .mapNotNull {
-                        return@mapNotNull when {
-                            it.isActivity() -> it
-                            it.isWorkflow() -> it
-                            else -> null
-                        }
-                    },
-                element.containingFile,
-            )
+            val methods = element.resolveGlobal(false)
+                .mapNotNull { it as? Method }
+                .mapNotNull {
+                    return@mapNotNull when {
+                        it.isActivity() -> it
+                        it.isWorkflow() -> it
+                        else -> null
+                    }
+                }
+
+            CachedValueProvider.Result.create(methods, element, *methods.toTypedArray())
         }
         if (targetMethods.isEmpty()) return null
 
@@ -45,12 +44,12 @@ class TemporalTypeProvider : PhpTypeProvider4 {
 
         targetMethods.map { method ->
             val signed = PhpTypeSignatureKey.getSignature(method)
-            println("signed: $signed")
+//            println("signed: $signed")
             val parametrized = PhpType.createParametrized(
                 PhpTypeSignatureKey.CLASS.sign(UtilClasses.REACT_PROMISE),
                 signed
             )
-            println("parametrized $parametrized ${parametrized.typesWithParametrisedParts} ${parametrized.isComplete}")
+//            println("parametrized $parametrized ${parametrized.typesWithParametrisedParts} ${parametrized.isComplete}")
             newType.add(parametrized)
         }
         return newType.build()

@@ -20,6 +20,16 @@
                 enabledByDefault="true"
                 level="WARNING"
                 implementationClass="com.github.xepozz.temporal.languages.php.inspections.PhpActivityMethodInspection"/>
+        <localInspection
+                language="PHP"
+                groupPath="Temporal"
+                groupName="PHP"
+                shortName="PhpActivityMethodUsageInspection"
+                key="inspection.php.activity.method.usage.attribute.missing.display.name"
+                bundle="messages.TemporalBundle"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="com.github.xepozz.temporal.languages.php.inspections.PhpActivityMethodUsageInspection"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.github.xepozz.temporal">
