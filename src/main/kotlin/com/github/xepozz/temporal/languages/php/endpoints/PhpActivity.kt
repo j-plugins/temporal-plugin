@@ -50,7 +50,7 @@ class PhpActivity : Activity {
                     phpClass.methods.find { it.name == methodName && it.isActivity() }?.let { method ->
                         results.add(
                             ActivityModel(
-                                id = "$methodName (${phpClass.name})",
+                                id = "${phpClass.name}::$methodName",
                                 language = "PHP",
                                 psiAnchor = smartPointerManager.createSmartPsiElementPointer(method),
                                 parameters = emptyList()

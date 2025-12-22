@@ -9,6 +9,7 @@ import com.intellij.microservices.endpoints.FrameworkPresentation
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
+import com.intellij.psi.PsiElement
 import java.util.function.Supplier
 import javax.swing.Icon
 import com.github.xepozz.temporal.common.model.Workflow as WorkflowModel
@@ -25,6 +26,14 @@ class TemporalWorkflowEndpointsProvider : EndpointsProvider<WorkflowEndpointGrou
         return listOf(WorkflowEndpoint(group.workflow))
     }
 
+    override fun getDocumentationElement(group: WorkflowEndpointGroup, endpoint: WorkflowEndpoint): PsiElement? {
+        return endpoint.workflow.psiAnchor?.dereference()
+    }
+
+    override fun getNavigationElement(group: WorkflowEndpointGroup, endpoint: WorkflowEndpoint): PsiElement? {
+        return endpoint.workflow.psiAnchor?.dereference()
+    }
+
     override fun getModificationTracker(project: Project): ModificationTracker = ModificationTracker.NEVER_CHANGED
 
     override fun getStatus(project: Project): EndpointsProvider.Status = EndpointsProvider.Status.AVAILABLE
@@ -34,7 +43,7 @@ class TemporalWorkflowEndpointsProvider : EndpointsProvider<WorkflowEndpointGrou
     override fun getEndpointPresentation(group: WorkflowEndpointGroup, endpoint: WorkflowEndpoint): ItemPresentation {
         return object : ItemPresentation {
             override fun getPresentableText(): String = endpoint.workflow.id
-            override fun getLocationString(): String? = endpoint.workflow.psiAnchor.element?.containingFile?.name
+            override fun getLocationString(): String? = endpoint.workflow.psiAnchor?.dereference()?.containingFile?.name
             override fun getIcon(unused: Boolean): Icon = TemporalIcons.TEMPORAL
         }
     }

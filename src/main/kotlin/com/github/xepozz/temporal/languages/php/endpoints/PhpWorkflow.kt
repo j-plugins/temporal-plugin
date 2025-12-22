@@ -47,10 +47,10 @@ class PhpWorkflow : Workflow {
                 val classFqn = parts[0]
                 val methodName = parts[1]
                 phpIndex.getClassesByFQN(classFqn).forEach { phpClass ->
-                    phpClass.methods.find { it.name == methodName && it.isWorkflow() }?.let { method ->
+                    phpClass.ownMethods.find { it.name == methodName && it.isWorkflow() }?.let { method ->
                         results.add(
                             WorkflowModel(
-                                id = "$methodName (${phpClass.name})",
+                                id = "${phpClass.name}::$methodName",
                                 language = "PHP",
                                 psiAnchor = smartPointerManager.createSmartPsiElementPointer(method),
                                 parameters = emptyList()

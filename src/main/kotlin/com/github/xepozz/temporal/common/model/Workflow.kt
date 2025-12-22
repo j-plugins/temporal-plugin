@@ -6,6 +6,6 @@ import com.intellij.psi.SmartPsiElementPointer
 data class Workflow(
     val id: String,
     val language: String,
-    val psiAnchor: SmartPsiElementPointer<out PsiElement>,
+    val psiAnchor: SmartPsiElementPointer<out PsiElement>?,
     val parameters: Collection<String>
 )
