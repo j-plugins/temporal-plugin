@@ -20,6 +20,7 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="com.github.xepozz.temporal.common.run.TemporalConfigurationType"/>
         <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalWorkflowEndpointsProvider"/>
         <microservices.endpointsProvider implementation="com.github.xepozz.temporal.common.endpoints.TemporalActivityEndpointsProvider"/>
         <projectConfigurable
