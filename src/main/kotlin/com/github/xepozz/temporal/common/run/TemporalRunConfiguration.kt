@@ -19,35 +19,16 @@ open class TemporalRunConfiguration(
         return super.getOptions() as TemporalRunConfigurationOptions
     }
 
-    var temporalExecutable: String?
-        get() = options.temporalExecutable
-        set(value) {
-            options.temporalExecutable = value
-        }
+    var temporalExecutable: String? by options::temporalExecutable
 
-    var port: Int
-        get() = options.port
-        set(value) {
-            options.port = value
-        }
+    var port: Int by options::port
+    var uiPort: Int by options::uiPort
 
-    var logLevel: String?
-        get() = options.logLevel
-        set(value) {
-            options.logLevel = value
-        }
+    var logLevel: String? by options::logLevel
 
-    var dynamicConfigValues: MutableMap<String, String>
-        get() = options.dynamicConfigValues
-        set(value) {
-            options.dynamicConfigValues = value
-        }
+    var dynamicConfigValues: MutableMap<String, String> by options::dynamicConfigValues
 
-    var searchAttributes: MutableMap<String, String>
-        get() = options.searchAttributes
-        set(value) {
-            options.searchAttributes = value
-        }
+    var searchAttributes: MutableMap<String, String> by options::searchAttributes
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
         return TemporalSettingsEditor(project)
