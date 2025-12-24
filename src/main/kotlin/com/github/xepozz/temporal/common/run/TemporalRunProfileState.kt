@@ -6,6 +6,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.util.execution.ParametersListUtil
 
 class TemporalRunProfileState(
     environment: ExecutionEnvironment,
@@ -31,6 +32,10 @@ class TemporalRunProfileState(
 
         for ((key, value) in configuration.searchAttributes) {
             commandLine.addParameters("--search-attribute", "$key=$value")
+        }
+
+        configuration.additionalArgs?.takeIf { it.isNotBlank() }?.let {
+            commandLine.addParameters(ParametersListUtil.parse(it))
         }
 
         val processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine)

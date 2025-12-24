@@ -9,4 +9,5 @@ open class TemporalRunConfigurationOptions : RunConfigurationOptions() {
     var logLevel by string("info")
     var dynamicConfigValues by map<String, String>()
     var searchAttributes by map<String, String>()
+    var additionalArgs by string("")
 }

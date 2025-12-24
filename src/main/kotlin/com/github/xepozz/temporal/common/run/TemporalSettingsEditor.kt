@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.JBIntSpinner
+import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.util.ui.FormBuilder
 import javax.swing.JComponent
@@ -18,6 +19,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     protected val logLevelField = ComboBox(arrayOf("debug", "info", "warn", "error", "never"))
     protected val dynamicConfigValuesField = ExpandableTextField()
     protected val searchAttributesField = ExpandableTextField()
+    protected val additionalArgsField = RawCommandLineEditor()
 
     init {
         temporalExecutableField.addBrowseFolderListener(
@@ -36,6 +38,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
             .addLabeledComponent(TemporalBundle.message("run.configuration.common.log.level.label"), logLevelField)
             .addLabeledComponent(TemporalBundle.message("run.configuration.common.dynamic.config.values.label"), dynamicConfigValuesField)
             .addLabeledComponent(TemporalBundle.message("run.configuration.common.search.attributes.label"), searchAttributesField)
+            .addLabeledComponent(TemporalBundle.message("run.configuration.common.additional.args.label"), additionalArgsField)
             .panel
     }
 
@@ -46,6 +49,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
         logLevelField.selectedItem = configuration.logLevel
         dynamicConfigValuesField.text = configuration.dynamicConfigValues.entries.joinToString("\n") { "${it.key}=${it.value}" }
         searchAttributesField.text = configuration.searchAttributes.entries.joinToString("\n") { "${it.key}=${it.value}" }
+        additionalArgsField.text = configuration.additionalArgs ?: ""
     }
 
     override fun applyEditorTo(configuration: TemporalRunConfiguration) {
@@ -55,6 +59,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
         configuration.logLevel = logLevelField.selectedItem as String?
         configuration.dynamicConfigValues = parseMap(dynamicConfigValuesField.text)
         configuration.searchAttributes = parseMap(searchAttributesField.text)
+        configuration.additionalArgs = additionalArgsField.text
     }
 
     private fun parseMap(text: String): MutableMap<String, String> {

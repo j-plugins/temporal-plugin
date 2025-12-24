@@ -29,6 +29,7 @@ open class TemporalRunConfiguration(
     var dynamicConfigValues: MutableMap<String, String> by options::dynamicConfigValues
 
     var searchAttributes: MutableMap<String, String> by options::searchAttributes
+    var additionalArgs: String? by options::additionalArgs
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
         return TemporalSettingsEditor(project)
