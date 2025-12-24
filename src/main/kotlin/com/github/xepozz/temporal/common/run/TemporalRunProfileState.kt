@@ -21,6 +21,7 @@ class TemporalRunProfileState(
         commandLine.addParameters("server", "start-dev")
         commandLine.addParameters("--port", configuration.port.toString())
         commandLine.addParameters("--ui-port", configuration.uiPort.toString())
+        commandLine.addParameters("--metrics-port", configuration.metricsPort.toString())
 
         configuration.logLevel?.takeIf { it.isNotBlank() }?.let {
             commandLine.addParameters("--log-level", it)

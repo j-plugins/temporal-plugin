@@ -23,6 +23,7 @@ open class TemporalRunConfiguration(
 
     var port: Int by options::port
     var uiPort: Int by options::uiPort
+    var metricsPort: Int by options::metricsPort
 
     var logLevel: String? by options::logLevel
 
