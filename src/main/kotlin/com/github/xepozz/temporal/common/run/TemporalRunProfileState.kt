@@ -1,5 +1,6 @@
 package com.github.xepozz.temporal.common.run
 
+import com.github.xepozz.temporal.common.configuration.TemporalExecutableManager
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessHandler
@@ -14,7 +15,9 @@ class TemporalRunProfileState(
 ) : CommandLineState(environment) {
 
     override fun startProcess(): ProcessHandler {
-        val temporalExecutable = configuration.temporalExecutable.takeIf { !it.isNullOrBlank() } ?: "temporal"
+        val manager = TemporalExecutableManager.getInstance(environment.project)
+        val executableConfig = manager.findByName(configuration.temporalExecutableName)
+        val temporalExecutable = executableConfig?.path?.takeIf { !it.isNullOrBlank() } ?: "temporal"
 
         val commandLine = GeneralCommandLine(temporalExecutable)
         commandLine.withWorkDirectory(environment.project.basePath)

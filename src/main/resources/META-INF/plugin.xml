@@ -28,6 +28,13 @@
                 bundle="messages.TemporalBundle" key="settings.configurable.title"
                 instance="com.github.xepozz.temporal.common.uiViewer.configuration.TemporalSettingsConfigurable"
         />
+        <projectConfigurable
+                id="settings.temporal.executables"
+                parentId="settings.temporal"
+                bundle="messages.TemporalBundle"
+                key="settings.executables.title"
+                instance="com.github.xepozz.temporal.common.configuration.TemporalExecutablesConfigurable"
+        />
         <toolWindow
                 id="Temporal" icon="/icons/temporal/icon.svg"
                 anchor="right" doNotActivateOnStart="true" secondary="false"

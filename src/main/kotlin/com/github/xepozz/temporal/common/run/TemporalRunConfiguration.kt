@@ -19,7 +19,7 @@ open class TemporalRunConfiguration(
         return super.getOptions() as TemporalRunConfigurationOptions
     }
 
-    var temporalExecutable: String? by options::temporalExecutable
+    var temporalExecutableName: String? by options::temporalExecutableName
 
     var port: Int by options::port
     var uiPort: Int by options::uiPort

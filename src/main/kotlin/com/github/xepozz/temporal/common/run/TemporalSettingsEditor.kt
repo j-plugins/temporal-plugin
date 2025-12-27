@@ -1,11 +1,13 @@
 package com.github.xepozz.temporal.common.run
 
 import com.github.xepozz.temporal.TemporalBundle
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.github.xepozz.temporal.common.configuration.TemporalExecutableManager
+import com.github.xepozz.temporal.common.configuration.TemporalExecutablesConfigurable
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.ComboboxWithBrowseButton
 import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.fields.ExpandableTextField
@@ -13,7 +15,7 @@ import com.intellij.util.ui.FormBuilder
 import javax.swing.JComponent
 
 open class TemporalSettingsEditor(protected val project: Project) : SettingsEditor<TemporalRunConfiguration>() {
-    protected val temporalExecutableField = TextFieldWithBrowseButton()
+    protected val temporalExecutableField = ComboboxWithBrowseButton(ComboBox<String>())
     protected val portField = JBIntSpinner(7233, 1, 65535)
     protected val uiPortField = JBIntSpinner(8233, 1, 65535)
     protected val metricsPortField = JBIntSpinner(57271, 1, 65535)
@@ -23,12 +25,24 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     protected val additionalArgsField = RawCommandLineEditor()
 
     init {
-        temporalExecutableField.addBrowseFolderListener(
-            project,
-            FileChooserDescriptorFactory.singleFile()
-                .withTitle(TemporalBundle.message("run.configuration.common.temporal.executable.browse.title"))
-                .withDescription(null)
-        )
+        temporalExecutableField.addActionListener {
+            val configurable = TemporalExecutablesConfigurable(project)
+            if (ShowSettingsUtil.getInstance().editConfigurable(project, configurable)) {
+                updateExecutables()
+            }
+        }
+        updateExecutables()
+    }
+
+    private fun updateExecutables() {
+        val manager = TemporalExecutableManager.getInstance(project)
+        val comboBox = temporalExecutableField.comboBox
+        val selected = comboBox.selectedItem as String?
+        comboBox.removeAllItems()
+        for (executable in manager.executables) {
+            executable.name.let { comboBox.addItem(it) }
+        }
+        comboBox.selectedItem = selected
     }
 
     override fun createEditor(): JComponent {
@@ -45,7 +59,8 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     }
 
     override fun resetEditorFrom(configuration: TemporalRunConfiguration) {
-        temporalExecutableField.text = configuration.temporalExecutable ?: ""
+        updateExecutables()
+        temporalExecutableField.comboBox.selectedItem = configuration.temporalExecutableName ?: ""
         portField.value = configuration.port
         uiPortField.value = configuration.uiPort
         metricsPortField.value = configuration.metricsPort
@@ -56,7 +71,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     }
 
     override fun applyEditorTo(configuration: TemporalRunConfiguration) {
-        configuration.temporalExecutable = temporalExecutableField.text
+        configuration.temporalExecutableName = temporalExecutableField.comboBox.selectedItem as String?
         configuration.port = portField.value as Int
         configuration.uiPort = uiPortField.value as Int
         configuration.metricsPort = metricsPortField.value as Int
