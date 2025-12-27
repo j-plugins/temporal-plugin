@@ -11,8 +11,9 @@ import com.intellij.ui.ComboboxWithBrowseButton
 import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.fields.ExpandableTextField
-import com.intellij.util.ui.FormBuilder
-import javax.swing.JComponent
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.panel
 
 open class TemporalSettingsEditor(protected val project: Project) : SettingsEditor<TemporalRunConfiguration>() {
     protected val temporalExecutableField = ComboboxWithBrowseButton(ComboBox<String>())
@@ -23,6 +24,38 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     protected val dynamicConfigValuesField = ExpandableTextField()
     protected val searchAttributesField = ExpandableTextField()
     protected val additionalArgsField = RawCommandLineEditor()
+
+    private val panel = panel {
+        row(TemporalBundle.message("run.configuration.common.temporal.executable.label")) {
+            cell(temporalExecutableField)
+                .align(AlignX.FILL)
+        }.layout(RowLayout.PARENT_GRID)
+        row(TemporalBundle.message("run.configuration.common.log.level.label")) {
+            cell(logLevelField)
+        }.layout(RowLayout.PARENT_GRID)
+        row(TemporalBundle.message("run.configuration.common.dynamic.config.values.label")) {
+            cell(dynamicConfigValuesField)
+                .align(AlignX.FILL)
+        }.layout(RowLayout.PARENT_GRID)
+        row(TemporalBundle.message("run.configuration.common.search.attributes.label")) {
+            cell(searchAttributesField)
+                .align(AlignX.FILL)
+        }.layout(RowLayout.PARENT_GRID)
+        row(TemporalBundle.message("run.configuration.common.additional.args.label")) {
+            cell(additionalArgsField)
+                .align(AlignX.FILL)
+        }.layout(RowLayout.PARENT_GRID)
+        group(TemporalBundle.message("run.configuration.common.ports.label"), false) {
+            row {
+                cell(portField)
+                    .label(TemporalBundle.message("run.configuration.common.server.label"))
+                cell(uiPortField)
+                    .label(TemporalBundle.message("run.configuration.common.ui.label"))
+                cell(metricsPortField)
+                    .label(TemporalBundle.message("run.configuration.common.metrics.label"))
+            }.layout(RowLayout.PARENT_GRID)
+        }.layout(RowLayout.PARENT_GRID)
+    }
 
     init {
         temporalExecutableField.addActionListener {
@@ -45,18 +78,9 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
         comboBox.selectedItem = selected
     }
 
-    override fun createEditor(): JComponent {
-        return FormBuilder.createFormBuilder()
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.temporal.executable.label"), temporalExecutableField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.port.label"), portField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.ui.port.label"), uiPortField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.metrics.port.label"), metricsPortField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.log.level.label"), logLevelField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.dynamic.config.values.label"), dynamicConfigValuesField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.search.attributes.label"), searchAttributesField)
-            .addLabeledComponent(TemporalBundle.message("run.configuration.common.additional.args.label"), additionalArgsField)
-            .panel
-    }
+    override fun createEditor() = panel
+
+    override fun isSpecificallyModified() = panel.isModified()
 
     override fun resetEditorFrom(configuration: TemporalRunConfiguration) {
         updateExecutables()
@@ -65,8 +89,10 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
         uiPortField.value = configuration.uiPort
         metricsPortField.value = configuration.metricsPort
         logLevelField.selectedItem = configuration.logLevel
-        dynamicConfigValuesField.text = configuration.dynamicConfigValues.entries.joinToString("\n") { "${it.key}=${it.value}" }
-        searchAttributesField.text = configuration.searchAttributes.entries.joinToString("\n") { "${it.key}=${it.value}" }
+        dynamicConfigValuesField.text =
+            configuration.dynamicConfigValues.entries.joinToString("\n") { "${it.key}=${it.value}" }
+        searchAttributesField.text =
+            configuration.searchAttributes.entries.joinToString("\n") { "${it.key}=${it.value}" }
         additionalArgsField.text = configuration.additionalArgs ?: ""
     }
 
