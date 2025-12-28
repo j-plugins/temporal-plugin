@@ -52,6 +52,7 @@ open class TemporalWindowFactory : ToolWindowFactory, DumbAware {
             listOf(
                 RefreshPageAction(browser),
                 OpenInSystemBrowserAction(browser),
+                OpenSettingsAction(),
             )
         )
 
