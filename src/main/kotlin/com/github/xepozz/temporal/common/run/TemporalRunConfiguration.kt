@@ -14,7 +14,6 @@ open class TemporalRunConfiguration(
     factory: ConfigurationFactory,
     name: String
 ) : RunConfigurationBase<TemporalRunConfigurationOptions>(project, factory, name) {
-
     override fun getOptions(): TemporalRunConfigurationOptions {
         return super.getOptions() as TemporalRunConfigurationOptions
     }

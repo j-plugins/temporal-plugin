@@ -1,23 +1,26 @@
 package com.github.xepozz.temporal.common.uiViewer.services
 
+import com.github.xepozz.temporal.common.run.TemporalConfigurationType
 import com.github.xepozz.temporal.common.uiViewer.NotificationUtils
 import com.github.xepozz.temporal.common.uiViewer.configuration.TemporalSettings
 import com.github.xepozz.temporal.common.uiViewer.events.EventService
+import com.intellij.execution.Executor
+import com.intellij.execution.RunManagerEx
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessTerminatedListener
+import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.ui.jcef.JBCefBrowser
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.cef.browser.CefBrowser
@@ -27,6 +30,8 @@ import org.cef.handler.CefLoadHandlerAdapter
 
 @Service(Service.Level.PROJECT)
 class StarterServerService(var project: Project) : Disposable {
+    private val settings = project.service<TemporalSettings>()
+
     val isActive
         get() = starterProcess?.isAlive == true
 
@@ -52,7 +57,7 @@ class StarterServerService(var project: Project) : Disposable {
 
         println("load browser url ${settings.address} $browser")
 
-        browser.loadURL(settings.address)
+//        browser.loadURL(settings.address)
 
         browser.jbCefClient.addLoadHandler(object : CefLoadHandlerAdapter() {
             override fun onLoadError(
@@ -100,21 +105,59 @@ class StarterServerService(var project: Project) : Disposable {
                     reloadBrowser()
                 }
             }
-            runStarterProcess(settings, listeners)
+            runStarterProcess(project, settings, listeners)
         }
     }
 
-    private fun runStarterProcess(settings: TemporalSettings, listeners: Collection<ProcessListener>) {
-        val projectBasePath = project.basePath!!
+    private fun runStarterProcess(
+        project: Project,
+        settings: TemporalSettings,
+        listeners: Collection<ProcessListener>
+    ) {
+        actionPerformed(project)
+        return
+//        val projectBasePath = project.basePath!!
+//
+//        val commandArgs = buildList {
+//            add(settings.binary.replace("%project%", projectBasePath))
+//            addAll(settings.command.trim().replace("%port%", settings.port.toString()).split(' '))
+//        }
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            executeCommand(commandArgs, listeners)
+//        }
+    }
 
-        val commandArgs = buildList {
-            add(settings.binary.replace("%project%", projectBasePath))
-            addAll(settings.command.trim().replace("%port%", settings.port.toString()).split(' '))
-        }
+    fun actionPerformed(project: Project) {
+        val runManager = RunManagerEx.getInstanceEx(project)
+//        val configurationFactory = TemporalConfigurationFactory(TemporalConfigurationType.getInstance())
 
-        CoroutineScope(Dispatchers.IO).launch {
-            executeCommand(commandArgs, listeners)
+        val uiViewerConfiguration = settings.uiViewerConfiguration
+        if (uiViewerConfiguration == null) {
+            println("empty settings.uiViewerConfiguration")
+            NotificationUtils.notifyWarning(
+                project,
+                "No Temporal configuration found",
+                "Please configure Temporal in Settings"
+            )
+            return
         }
+        println("find config by name $uiViewerConfiguration")
+        val configuration = runManager.findConfigurationByTypeAndName(
+            TemporalConfigurationType.getInstance(),
+            uiViewerConfiguration,
+            )
+
+        if (configuration == null) {
+            println("no configuration found for ${uiViewerConfiguration}")
+            return
+        }
+        println("found configuration $configuration")
+
+//        val configuration = runManager.createConfiguration(runConfiguration, configurationFactory)
+
+//        runManager.setTemporaryConfiguration(configuration)
+        ExecutionUtil.runConfiguration(configuration, Executor.EXECUTOR_EXTENSION_NAME.extensionList.first())
     }
 
     fun stop() {
@@ -145,6 +188,7 @@ class StarterServerService(var project: Project) : Disposable {
                 override fun startNotified(event: ProcessEvent) {
                     eventService.fireStarted()
                 }
+
                 override fun processTerminated(event: ProcessEvent) {
                     serverStartedChannel.trySend(false)
 
