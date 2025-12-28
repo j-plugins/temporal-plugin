@@ -20,7 +20,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.ListSelectionEvent
 
 class TemporalExecutablesConfigurable(private val project: Project) : SearchableConfigurable, Configurable {
-    private val manager = TemporalExecutableManager.getInstance(project)
+    private val executablesSettings = TemporalExecutablesSettings.getInstance(project)
     private val listModel = CollectionListModel<TemporalExecutable>()
     private val list = JBList(listModel)
 
@@ -128,7 +128,7 @@ class TemporalExecutablesConfigurable(private val project: Project) : Searchable
     }
 
     override fun isModified(): Boolean {
-        val currentExecutables = manager.executables
+        val currentExecutables = executablesSettings.executables
         if (listModel.items.size != currentExecutables.size) return true
         for (i in listModel.items.indices) {
             if (listModel.items[i] != currentExecutables[i]) return true
@@ -137,13 +137,13 @@ class TemporalExecutablesConfigurable(private val project: Project) : Searchable
     }
 
     override fun apply() {
-        manager.executables.clear()
-        manager.executables.addAll(listModel.items.map { it.copy() })
+        executablesSettings.executables.clear()
+        executablesSettings.executables.addAll(listModel.items.map { it.copy() })
     }
 
     override fun reset() {
         listModel.removeAll()
-        listModel.addAll(0, manager.executables.map { it.copy() })
+        listModel.addAll(0, executablesSettings.executables.map { it.copy() })
         if (listModel.size > 0) {
             list.selectedIndex = 0
         } else {

@@ -1,8 +1,8 @@
 package com.github.xepozz.temporal.common.run
 
 import com.github.xepozz.temporal.TemporalBundle
-import com.github.xepozz.temporal.common.configuration.TemporalExecutableManager
 import com.github.xepozz.temporal.common.configuration.TemporalExecutablesConfigurable
+import com.github.xepozz.temporal.common.configuration.TemporalExecutablesSettings
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
@@ -68,7 +68,7 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     }
 
     private fun updateExecutables() {
-        val manager = TemporalExecutableManager.getInstance(project)
+        val manager = TemporalExecutablesSettings.getInstance(project)
         val comboBox = temporalExecutableField.comboBox
         val selected = comboBox.selectedItem as String?
         comboBox.removeAllItems()
