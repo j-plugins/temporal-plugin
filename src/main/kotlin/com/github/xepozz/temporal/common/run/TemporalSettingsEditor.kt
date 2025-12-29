@@ -13,9 +13,14 @@ import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.bindIntValue
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.toMutableProperty
 
-open class TemporalSettingsEditor(protected val project: Project) : SettingsEditor<TemporalRunConfiguration>() {
+open class TemporalSettingsEditor(
+    private val project: Project,
+    private val configuration: TemporalRunConfiguration,
+) : SettingsEditor<TemporalRunConfiguration>() {
     protected val temporalExecutableField = ComboboxWithBrowseButton(ComboBox<String>())
     protected val portField = JBIntSpinner(7233, 1, 65535)
     protected val uiPortField = JBIntSpinner(8233, 1, 65535)
@@ -28,30 +33,52 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
     private val panel = panel {
         row(TemporalBundle.message("run.configuration.common.temporal.executable.label")) {
             cell(temporalExecutableField)
+                .bind(
+                    { it.comboBox.selectedItem as? String },
+                    { _, value -> configuration.temporalExecutableName = value },
+                    configuration::temporalExecutableName.toMutableProperty()
+                )
                 .align(AlignX.FILL)
         }.layout(RowLayout.PARENT_GRID)
         row(TemporalBundle.message("run.configuration.common.log.level.label")) {
             cell(logLevelField)
         }.layout(RowLayout.PARENT_GRID)
         row(TemporalBundle.message("run.configuration.common.dynamic.config.values.label")) {
-            cell(dynamicConfigValuesField)
+            cell(dynamicConfigValuesField).bind(
+                { parseMap(it.text) },
+                { _, value -> configuration.dynamicConfigValues = value },
+                configuration::dynamicConfigValues.toMutableProperty()
+            )
                 .align(AlignX.FILL)
         }.layout(RowLayout.PARENT_GRID)
         row(TemporalBundle.message("run.configuration.common.search.attributes.label")) {
-            cell(searchAttributesField)
+            cell(searchAttributesField).bind(
+                { parseMap(it.text) },
+                { _, value -> configuration.searchAttributes = value },
+                configuration::searchAttributes.toMutableProperty()
+            )
                 .align(AlignX.FILL)
         }.layout(RowLayout.PARENT_GRID)
         row(TemporalBundle.message("run.configuration.common.additional.args.label")) {
             cell(additionalArgsField)
+                .onChanged { this@TemporalSettingsEditor.fireEditorStateChanged() }
+                .bind(
+                    { it.text },
+                    { _, value -> configuration.additionalArgs = value },
+                    configuration::additionalArgs.toMutableProperty()
+                )
                 .align(AlignX.FILL)
         }.layout(RowLayout.PARENT_GRID)
         group(TemporalBundle.message("run.configuration.common.ports.label"), false) {
             row {
                 cell(portField)
+                    .bindIntValue(configuration::port)
                     .label(TemporalBundle.message("run.configuration.common.server.label"))
                 cell(uiPortField)
+                    .bindIntValue(configuration::uiPort)
                     .label(TemporalBundle.message("run.configuration.common.ui.label"))
                 cell(metricsPortField)
+                    .bindIntValue(configuration::metricsPort)
                     .label(TemporalBundle.message("run.configuration.common.metrics.label"))
             }.layout(RowLayout.PARENT_GRID)
         }.layout(RowLayout.PARENT_GRID)
@@ -80,31 +107,14 @@ open class TemporalSettingsEditor(protected val project: Project) : SettingsEdit
 
     override fun createEditor() = panel
 
-    override fun isSpecificallyModified() = panel.isModified()
+    override fun isSpecificallyModified() = panel.isModified().apply { println("isModified $this") }
 
-    override fun resetEditorFrom(configuration: TemporalRunConfiguration) {
-        updateExecutables()
-        temporalExecutableField.comboBox.selectedItem = configuration.temporalExecutableName ?: ""
-        portField.value = configuration.port
-        uiPortField.value = configuration.uiPort
-        metricsPortField.value = configuration.metricsPort
-        logLevelField.selectedItem = configuration.logLevel
-        dynamicConfigValuesField.text =
-            configuration.dynamicConfigValues.entries.joinToString("\n") { "${it.key}=${it.value}" }
-        searchAttributesField.text =
-            configuration.searchAttributes.entries.joinToString("\n") { "${it.key}=${it.value}" }
-        additionalArgsField.text = configuration.additionalArgs ?: ""
+    override fun resetEditorFrom(runConfiguration: TemporalRunConfiguration) {
+        panel.reset()
     }
 
-    override fun applyEditorTo(configuration: TemporalRunConfiguration) {
-        configuration.temporalExecutableName = temporalExecutableField.comboBox.selectedItem as String?
-        configuration.port = portField.value as Int
-        configuration.uiPort = uiPortField.value as Int
-        configuration.metricsPort = metricsPortField.value as Int
-        configuration.logLevel = logLevelField.selectedItem as String?
-        configuration.dynamicConfigValues = parseMap(dynamicConfigValuesField.text)
-        configuration.searchAttributes = parseMap(searchAttributesField.text)
-        configuration.additionalArgs = additionalArgsField.text
+    override fun applyEditorTo(runConfiguration: TemporalRunConfiguration) {
+        panel.apply()
     }
 
     private fun parseMap(text: String): MutableMap<String, String> {

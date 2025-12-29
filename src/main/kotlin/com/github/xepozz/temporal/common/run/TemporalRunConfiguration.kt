@@ -32,7 +32,7 @@ open class TemporalRunConfiguration(
     var additionalArgs: String? by options::additionalArgs
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
-        return TemporalSettingsEditor(project)
+        return TemporalSettingsEditor(project, this)
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
