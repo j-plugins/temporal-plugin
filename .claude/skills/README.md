@@ -1,8 +1,24 @@
 # Claude Code Skills for temporal-plugin
 
-These skills scaffold **official Temporal PHP SDK** patterns that the plugin
-already recognizes (via `TemporalClasses.kt`, the file-based indexes, and the
-PHP inspections). Invoke any of them in Claude Code with `/<skill-name>`.
+Invoke any skill in Claude Code with `/<skill-name>`.
+
+## Plugin-development skills (this repo's stack)
+
+| Skill | Purpose |
+|---|---|
+| `/intellij-plugin-dev` | General IntelliJ Platform plugin-dev rules (sourced from the official JetBrains SDK docs). Entry point with topic files: `structure.md`, `extensions.md`, `services.md`, `threading.md`, `psi.md`, `indexes.md`, `inspections.md`, `actions-ui.md`, `gradle.md`, `kotlin.md`. |
+| `/kotlin-dev` | Project-specific Kotlin conventions (common vs. languages packages, EP pattern, PHP mixins, naming, performance). |
+| `/kotlin-test` | Writing JUnit 4 + IntelliJ Platform Test Framework tests for inspections, indexes, EP impls, and pure logic. |
+
+**How they layer:** `/intellij-plugin-dev` is the foundation (general platform
+knowledge). `/kotlin-dev` adds this repo's conventions on top. `/kotlin-test`
+covers tests for everything either produces.
+
+## Temporal SDK scaffolding skills
+
+These generate **official Temporal PHP SDK** patterns the plugin already
+recognises via `TemporalClasses.kt`, the file-based indexes, and the PHP
+inspections.
 
 | Skill | Purpose |
 |---|---|
@@ -19,8 +35,4 @@ PHP inspections). Invoke any of them in Claude Code with `/<skill-name>`.
 | `/temporal-test` | Scaffold PHPUnit tests using `WorkflowEnvironment` / `ActivityMocker` |
 
 Each skill lives under `.claude/skills/<name>/SKILL.md` and contains the full
-prompt, the code template, and the conventions Claude must follow. The templates
-follow the FQCNs declared in
-`src/main/kotlin/com/github/xepozz/temporal/languages/php/TemporalClasses.kt`,
-so anything they generate is picked up by the plugin's indexes and inspections
-automatically.
+prompt, the code template, and the conventions Claude must follow.
